@@ -12,22 +12,25 @@ class User:
         self.interest=interest
         self.folow=folow
         self.folowed=folowed
+        self.key=f"{name}_{lastname}"
     def __repr__(self):
-        output=f"firstname: {self.firstname}\nlastname: {self.lastname}\nage: {self.age}\nYear of study: {self.yearStudy}\nField of study: {self.fieldStudy}\nCity: {self.city}\n"
+        output="/////////////////////////////////////////////////////////\n"
+        output+=f"firstname: {self.firstname}\nlastname: {self.lastname}\nage: {self.age}\nYear of study: {self.yearStudy}\nField of study: {self.fieldStudy}\nCity: {self.city}\n"
         output+="Interest :\n"
         for i in self.interest:
             output+= f"{i}\n"
         output+= "Folow :\n"
         for i in self.folow:
             output+= f"{i}\n"
-        output+= "Folowed by :"
+        output+= "Folowed by :\n"
         for i in self.folowed:
             output+= f"{i}\n"
+        output+="/////////////////////////////////////////////////////////\n"
         return output
-    def addFolow(self,name,lastname):
-        self.folow.append(f"{name}_{lastname}")
-    def addfolowed(self,name,lastname):
-        self.folowed.append(f"{name}_{lastname}")
+    def addFolow(self,usr):
+        self.folow.append(usr.key)
+    def addFolower(self,usr):
+        self.folowed.append(usr.key)
 
 
 database={}
@@ -36,28 +39,27 @@ database={}
 
     
 def AddUser(database):
-    name=input("Enter the name of the user").lower()
-    lastname=input("Enter the lastname of the user").lower()
+    name=input("Enter the name of the user : ").lower()
+    lastname=input("Enter the lastname of the user : ").lower()
 
     if f"{name}_{lastname}" in database.keys():
         print("the user alrdeay exist")
         return
 
-    age=int(input("Enter the age of the user"))
-    yearStudy=int(input("Enter the year of study of the user"))
-    fieldStudy=input("Enter the field of study of the user")
-    nbinterest=int(input("how many interest does he have?"))
+    age=int(input("Enter the age of the user : "))
+    yearStudy=int(input("Enter the year of study of the user : "))
+    fieldStudy=input("Enter the field of study of the user : ")
+    nbinterest=int(input("how many interest does he have? : "))
     interest=[]
     for i in range(nbinterest):
-        interest.append(input("Enter the interest of the user"))
-    city=input("Enter the city of the user")  
+        interest.append(input("Enter the interest of the user : "))
+    city=input("Enter the city of the user : ")  
     database[f"{name}_{lastname}"]=User(name,lastname,age,yearStudy,fieldStudy,city,interest)
-    saveDatabase(database)
+    saveDatabase(database,database[f"{name}_{lastname}"])
 
 
-def saveDatabase(database):
-    for key in database.keys():
-        pickle.dump(database[key], open(f"Users/"+key, "wb"))
+def saveDatabase(database,user):
+    pickle.dump(user, open(f"Users/"+user.key, "wb"))
 
 
 def loadDatabase(database):
@@ -68,9 +70,9 @@ def loadDatabase(database):
 
 def getByName(database,firstname):
     correspondant=[]
-    for key in database.keys():
-        if firstname in key:
-            correspondant.append(database[key])
+    for key,usr in database.items():
+        if firstname == usr.firstname:
+            correspondant.append(usr)
     if len(correspondant)==0:
         print(f"there is no user named {firstname}")
         return 0, False
@@ -83,12 +85,60 @@ def getByName(database,firstname):
     else:
         return correspondant[0],True
 
+def getByField(database,field):
+    correspondant=[]
+    for key,usr in database.items():
+        if field == usr.fieldStudy:
+            correspondant.append(usr)
+        return correspondant, False
+    else:
+        return correspondant,True
+
+def getByInterest(database,interest):
+    correspondant=[]
+    for key,usr in database.items():
+        if interest in usr.interest:
+            correspondant.append(usr)
+    if len(correspondant)==0:
+        print(f"there is no user interested in {interest}")
+        return correspondant, False
+    else:
+        return correspondant,True
+
+def getByYear(database,year):
+    correspondant=[]
+    for key,usr in database.items():
+        if year == usr.yearStudy:
+            correspondant.append(usr)
+    if len(correspondant)==0:
+        print(f"there is no user studying since {year}")
+        return correspondant, False
+    else:
+        return correspondant,True
+
 def searchByName(database):
     firstname=str(input("What is his first name :"))
     usr,find=getByName(database,firstname)
     if find:
         print(usr)
-        return usr
+
+def searchByField(database):
+    field=str(input("What is his field name :"))
+    usrs,find=getByField(database,field)
+    for usr in usrs:
+        print(usr)
+
+def searchByYear(database):
+    year=int(input("What is his year of study :"))
+    usrs,find=getByYear(database,year)
+    for usr in usrs:
+        print(usr)
+
+def searchByInterest(database):
+    interest=str(input("What is his first name :"))
+    usrs,find=getByInterest(database,interest)
+    for usr in usrs:
+        print(usr)
 
 def searchUser(database):
     print("How do you want to search for a user\n1.name\n2.field\n3.year of study\n4.areas of interest\n5.Quit")
@@ -96,39 +146,48 @@ def searchUser(database):
     if choice==1:
         searchByName(database)
     elif choice==2:
-        return
+        searchByField(database)
     elif choice==3: 
-        return
+        searchByYear(database)
     elif choice==4:
-        return
+        searchByInterest(database)
     elif choice==5:
         return
 
 def AddFolow(database):
-    name1=str(input("Who do you want to add folow"))
+    name1=str(input("Who do you want to add folow : "))
     usr1,find1=getByName(database,name1)
     if not find1:
+        print("the User could not be found")
         return
-    name2=str(input("Who do you want to folow"))
+    name2=str(input("Who do you want to folow : "))
     usr2,find2=getByName(database,name2)
     if not find2:
         return
-    usr1.addFolow(usr2.firstname,usr2.lastname)
-    usr2.addFolower(usr1.firstname,usr1.lastname)
+    usr1.addFolow(usr2)
+    usr2.addFolower(usr1)
+    saveDatabase(database,usr1)
+    saveDatabase(database,usr2)
 
 def DelteUser(database):
-    firstname=str(input("what is the name of the user you want to delete :"))
-    usr,find =getByName(database,firstname)
+    firstname=str(input("what is the name of the user you want to delete : "))
+    delusr,find =getByName(database,firstname)
     if not find:
         return
-    del database[f"{usr.firstname}_{usr.lastname}"]
-    os.remove(f"Users/{usr.firstname}_{usr.lastname}")
+    del database[delusr.key]
+    for key,usr in database.items():
+        if delusr.key in usr.folow:
+            usr.folow.remove(delusr.key)
+        if delusr.key in usr.folowed:
+            usr.folowed.remove(delusr.key)
+    
+    os.remove(f"Users/{delusr.key}")
 
 def updateUser():
     return
 
 def modificationUsers(database):
-    print("What do you want to do?\n1. Insert a user\n2.delete an user\n3.Update an users_n4. Quit")
+    print("What do you want to do?\n1. Insert a user\n2.delete an user\n3.Update an users\n4. Quit")
     choice=int(input("Your choice :"))
     if choice==1:
         AddUser(database)
@@ -138,6 +197,14 @@ def modificationUsers(database):
         updateUser()
     elif choice==4:
         return
+
+def displayFolowers(database):
+    firstname=str(input("who do you want to display followers :"))
+    usr,find=getByName(database,firstname)
+    if find:
+        print(f"{usr.firstname} {usr.lastname} is folowed by:")
+        for folower in usr.folowed:
+            print(folower)
 
 def apllication(database):
     loadDatabase(database)
@@ -149,14 +216,14 @@ def apllication(database):
         if choice ==1:
             modificationUsers(database)
         elif choice ==2:
-            return
+            AddFolow(database)
         elif choice ==3:
-            return
+            displayFolowers(database)
         elif choice ==4:
             searchUser(database)
         elif choice ==5:
             return
         elif choice ==6:
             active=False
-    saveDatabase(database)
+
 apllication(database)
