@@ -19,10 +19,10 @@ class User:
         output+="Interest :\n"
         for i in self.interest:
             output+= f"{i}\n"
-        output+= "Folow :\n"
+        output+= "Follow :\n"
         for i in self.folow:
             output+= f"{i}\n"
-        output+= "Folowed by :\n"
+        output+= "Followed by :\n"
         for i in self.folowed:
             output+= f"{i}\n"
         output+="/////////////////////////////////////////////////////////\n"
@@ -43,13 +43,13 @@ def AddUser(database):
     lastname=input("Enter the lastname of the user : ").lower()
 
     if f"{name}_{lastname}" in database.keys():
-        print("the user alrdeay exist")
+        print("the user already exists")
         return
 
     age=int(input("Enter the age of the user : "))
     yearStudy=int(input("Enter the year of study of the user : "))
     fieldStudy=input("Enter the field of study of the user : ")
-    nbinterest=int(input("how many interest does he have? : "))
+    nbinterest=int(input("how many interests does he have? : "))
     interest=[]
     for i in range(nbinterest):
         interest.append(input("Enter the interest of the user : "))
@@ -135,7 +135,7 @@ def searchByYear(database):
         print(usr)
 
 def searchByInterest(database):
-    interest=str(input("What is his first name :"))
+    interest=str(input("What is his interest :"))
     usrs,find=getByInterest(database,interest)
     for usr in usrs:
         print(usr)
@@ -184,7 +184,33 @@ def DelteUser(database):
     os.remove(f"Users/{delusr.key}")
 
 def updateUser():
-    return
+    name=str(input("Which user do you want to update : "))
+    usr,find=getByName(database,name)
+    if not find:
+        print("the User could not be found")
+        return
+    if find:
+        print(usr)
+        print("What do you want to change :\n1.name\n2.field\n3.year of study\n4.areas of interest\n5.Age\n6.City\n7.Quit")
+        choice=int(input("Your choice :"))
+        if choice==1:
+            usr.name=input("Enter the new name of the user : ").lower()
+            usr.lastname=input("Enter the new lastname of the user : ").lower()
+        elif choice==2:
+            usr.fieldStudy=input("Enter the new field of study of the user : ")
+        elif choice==3: 
+            usr.yearStudy=int(input("Enter the new year of study of the user : "))
+        elif choice==4:
+            nbinterest=int(input("how many new interests does he have? : "))
+            for i in range(nbinterest):
+                usr.interest.append(input("Enter the interest of the user : "))
+        elif choice==5:
+            usr.age=int(input("Enter the age of the user : "))
+        elif choice==6:
+            usr.city=input("Enter the city of the user : ")     
+        elif choice==7:
+            return
+        saveDatabase(database,usr)
 
 def modificationUsers(database):
     print("What do you want to do?\n1. Insert a user\n2.delete an user\n3.Update an users\n4. Quit")
@@ -206,6 +232,39 @@ def displayFolowers(database):
         for folower in usr.folowed:
             print(folower)
 
+def userSuggestions(database):
+    firstname=str(input("who do you want to have follow suggestions for :"))
+    usr,find=getByName(database,firstname)
+    if not find:
+        print("the User could not be found")
+        return
+    else:
+        following=[]
+        followers=[]
+        for folower in usr.folowed:
+            followers.append(folower)
+        for folowed in usr.folow:
+            following.append(folowed)
+        results=[]
+        for usrs in database.items():
+            name = usrs.key
+            if name not in following:            
+                correspondant=0
+                for interest in usr.interest:
+                    if interest in usrs.interest:
+                        correspondant+=1
+                for folower in followers:
+                    for folows in folower.folow:
+                        if name == folows:
+                            correspondant+=1
+            results.append([name,correspondant])
+        for i in range(len(results)):
+            for j in range(0, len(results)-i-1):
+                if results[j][1] > results[j+1][1] :
+                    results[j][1], results[j+1][1] = results[j+1][1], results[j][1]
+        for k in range(4):
+            print(results[k][0])
+
 def apllication(database):
     loadDatabase(database)
     active=True
@@ -222,7 +281,7 @@ def apllication(database):
         elif choice ==4:
             searchUser(database)
         elif choice ==5:
-            return
+            userSuggestions(database)
         elif choice ==6:
             active=False
 
