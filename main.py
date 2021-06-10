@@ -59,7 +59,7 @@ def AddUser(database):
 
 
 def saveDatabase(database,user):
-    pickle.dump(user, open(f"Users/"+user.key, "wb"))
+    pickle.dump(user, open("Users/"+user.key, "wb"))
 
 
 def loadDatabase(database):
@@ -246,23 +246,26 @@ def userSuggestions(database):
         for folowed in usr.folow:
             following.append(folowed)
         results=[]
-        for usrs in database.items():
-            name = usrs.key
-            if name not in following:            
+        print("On what do you want your suggestions to be based on?\n1. Mutual Interests\n2. Mutual Connections\n3. Both")
+        choice=int(input("Your choice :"))
+        for key ,usrs in database.items():
+            if key not in following:            
                 correspondant=0
-                for interest in usr.interest:
-                    if interest in usrs.interest:
-                        correspondant+=1
-                for folower in followers:
-                    for folows in folower.folow:
-                        if name == folows:
+                if choice == 1 or choice == 3:
+                    for interest in usr.interest:
+                        if interest in usrs.interest:
                             correspondant+=1
-            results.append([name,correspondant])
+                if choice == 2 or choice == 3:
+                    for folower in followers:
+                        for folows in usrs.folowed:
+                            if key == folows:
+                                correspondant+=1
+            results.append([key,correspondant])
         for i in range(len(results)):
             for j in range(0, len(results)-i-1):
                 if results[j][1] > results[j+1][1] :
-                    results[j][1], results[j+1][1] = results[j+1][1], results[j][1]
-        for k in range(4):
+                    results[j], results[j+1] = results[j+1], results[j]
+        for k in range(5):
             print(results[k][0])
 
 def apllication(database):
