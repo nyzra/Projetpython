@@ -1,3 +1,24 @@
+#!/usr/bin/env python3
+"""! @brief Snapch'UTT NF05a Project - Lucas Sauron - Zoé Boutin"""
+##
+# @mainpage Snapch'UTT NF05a Project - Lucas Sauron - Zoé Boutin
+#
+# @section description_main Description
+# The aim of the project is to code a simplified database of a social network, to connect different users from UTT.
+#
+# 
+# @file main.py
+#
+# @brief Snapch'UTT NF05a Project - Lucas Sauron - Zoé Boutin
+#
+# @section libraries_main Libraries/Modules
+# - os library
+# - pickle library
+#
+# @section author_doxygen_example Author(s)
+# - Created by Lucas Sauron and Zoé Boutin
+#
+# Imports
 import os
 import pickle
 
@@ -41,10 +62,12 @@ class User:
 database={}
 #initialisation of the database dictionnary before loading the users stored in the memory using loadDatabase
 
-
+# Functions
     
 def AddUser(database):
-    #function to add a user in the dictionnary using saveDatabase
+    """!     function to add a user in the dictionnary using saveDatabase
+    @param database   dictionary used to store the user keys
+    """
     name=input("Enter the name of the user : ").lower()
     lastname=input("Enter the lastname of the user : ").lower()
 
@@ -65,19 +88,29 @@ def AddUser(database):
 
 
 def saveDatabase(database,user):
-    #function to save a new user as a file in the 'Users' directory
+    """!      function to save a new user as a file in the 'Users' directory
+    @param database   dictionary used to store the user keys
+    @param user User class item to add to the database
+    """
     pickle.dump(user, open("Users/"+user.key, "wb"))
 
 
 def loadDatabase(database):
-    #function used at the beginning of each execution to load all the users stored in the 'Users' directory to put them in the database dictionnary
+    """!     function used at the beginning of each execution to load all the users stored in the 'Users' directory to put them in the database dictionnary
+    @param database   dictionary used to store the user keys
+    """
     for file_name in os.listdir("Users"):
         chemin = os.path.join("Users", file_name)
         key = file_name.lower()
         database[key]=pickle.load(open(chemin,"rb"))
 
 def getByName(database,firstname):
-    #function to retrieve a user with his name
+    """!  function to retrieve a user with his name
+    @param database   dictionary used to store the user keys
+    @param firstname string corresponding to the name we want to search
+
+    @return the correponding user
+    """
     correspondant=[]
     for key,usr in database.items():
         if firstname == usr.firstname:
@@ -95,7 +128,12 @@ def getByName(database,firstname):
         return correspondant[0],True
 
 def getByField(database,field):
-    #function to retrieve a user (or more) with his field
+    """!  function to retrieve a user (or more) with his field
+    @param database   dictionary used to store the user keys
+    @param field string corresponding to the field we want to search
+
+    @return the list of correponding users
+    """
     correspondant=[]
     for key,usr in database.items():
         if field == usr.fieldStudy:
@@ -105,7 +143,12 @@ def getByField(database,field):
         return correspondant,True
 
 def getByInterest(database,interest):
-    #function to retrieve a user (or more) with his interest
+    """!  function to retrieve a user (or more) with his interest
+    @param database   dictionary used to store the user keys
+    @param interest string corresponding to the interest we want to search
+ 
+    @return the list of correponding users
+    """
     correspondant=[]
     for key,usr in database.items():
         if interest in usr.interest:
@@ -116,8 +159,13 @@ def getByInterest(database,interest):
     else:
         return correspondant,True
 
-def getByYear(database,year):    
-    #function to retrieve a user (or more) with his year of study
+def getByYear(database,year):  
+    """!  function to retrieve a user (or more) with his year of study
+    @param database   dictionary used to store the user keys
+    @param year int corresponding to the year we want to search
+    
+    @return the list of correponding users
+    """
     correspondant=[]
     for key,usr in database.items():
         if year == usr.yearStudy:
@@ -129,35 +177,45 @@ def getByYear(database,year):
         return correspondant,True
 
 def searchByName(database):
-    #function to search for a user using his name
+    """!  function to search for a user using his name
+    @param database   dictionary used to store the user keys
+    """
     firstname=str(input("What is his first name :"))
     usr,find=getByName(database,firstname)
     if find:
         print(usr)
 
 def searchByField(database):
-    #function to search for a user (or more) using his field
+    """!  function to search for a user (or more) using his field
+    @param database   dictionary used to store the user keys
+    """
     field=str(input("What is his field name :"))
     usrs,find=getByField(database,field)
     for usr in usrs:
         print(usr)
 
 def searchByYear(database):
-    #function to search for a user (or more) using his year of study
+    """!  function to search for a user (or more) using his year of study
+    @param database   dictionary used to store the user keys
+    """
     year=int(input("What is his year of study :"))
     usrs,find=getByYear(database,year)
     for usr in usrs:
         print(usr)
 
 def searchByInterest(database):
-    #function to search for a user (or more) using his interest
+    """!  function to search for a user (or more) using his interest
+    @param database   dictionary used to store the user keys
+    """
     interest=str(input("What is his interest :"))
     usrs,find=getByInterest(database,interest)
     for usr in usrs:
         print(usr)
 
 def searchUser(database):
-    #function to search for a user using a certain parameter that is chosen
+    """!  function to search for a user using a certain parameter that is chosen
+    @param database   dictionary used to store the user keys
+    """
     print("How do you want to search for a user\n1.name\n2.field\n3.year of study\n4.areas of interest\n5.Quit")
     choice=int(input("Your choice :"))
     if choice==1:
@@ -172,7 +230,9 @@ def searchUser(database):
         return
 
 def AddFolow(database):
-    #function to add a follower/following link between two users 
+    """!  function to add a follower/following link between two users
+    @param database   dictionary used to store the user keys
+    """
     name1=str(input("Who do you want to add folow : "))
     usr1,find1=getByName(database,name1)
     if not find1:
@@ -188,7 +248,9 @@ def AddFolow(database):
     saveDatabase(database,usr2)
 
 def DelteUser(database):
-    #function to delete a user (deletion of the user and all his iterances in follower and following lists of other users)
+    """!  function to delete a user (deletion of the user and all his iterances in follower and following lists of other users)
+    @param database   dictionary used to store the user keys
+    """
     firstname=str(input("what is the name of the user you want to delete : "))
     delusr,find =getByName(database,firstname)
     if not find:
@@ -202,8 +264,9 @@ def DelteUser(database):
     
     os.remove(f"Users/{delusr.key}")
 
-def updateUser():
-    #function to update a user, changing the field of your choice
+def updateUser(database):
+    """!  function to update a user, changing the field of your choice
+    """
     name=str(input("Which user do you want to update : "))
     usr,find=getByName(database,name)
     if not find:
@@ -233,7 +296,9 @@ def updateUser():
         saveDatabase(database,usr)
 
 def modificationUsers(database):
-    #function to choose whether you want to  add, update or delete a user
+    """!  function to choose whether you want to  add, update or delete a user
+    @param database   dictionary used to store the user keys
+    """
     print("What do you want to do?\n1. Insert a user\n2.delete an user\n3.Update an users\n4. Quit")
     choice=int(input("Your choice :"))
     if choice==1:
@@ -241,12 +306,14 @@ def modificationUsers(database):
     elif choice==2:
         DelteUser(database)
     elif choice==3: 
-        updateUser()
+        updateUser(database)
     elif choice==4:
         return
 
 def displayFolowers(database):
-    #function to display the followers of a certain user
+    """!  function to display the followers of a certain user
+    @param database   dictionary used to store the user keys
+    """
     firstname=str(input("who do you want to display followers :"))
     usr,find=getByName(database,firstname)
     if find:
@@ -255,7 +322,9 @@ def displayFolowers(database):
             print(folower)
 
 def userSuggestions(database):
-    #function to display 5 following suggestions for a user using (by choice) their mutual connections or their mutual interests
+    """!  function to display 5 following suggestions for a user using (by choice) their mutual connections or their mutual interests
+    @param database   dictionary used to store the user keys
+    """
     firstname=str(input("who do you want to have follow suggestions for :"))
     usr,find=getByName(database,firstname)
     if not find:
@@ -292,7 +361,9 @@ def userSuggestions(database):
             print(results[k][0])
 
 def apllication(database):
-    #the main function that loads the database dictionnary using loadDatabase and runs until the execution is terminated, it calls all the pther functions and is mainly the main user interface
+    """!  the main function that loads the database dictionnary using loadDatabase and runs until the execution is terminated, it calls all the pther functions and is mainly the main user interface
+    @param database   dictionary used to store the user keys
+    """
     loadDatabase(database)
     active=True
     while active:
